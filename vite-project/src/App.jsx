@@ -12,12 +12,14 @@ function App() {
   const [button, setButton] = useState('Connect Wallet')
   const [message, setMessage] = useState('Connect Wallet');
   const [owned, setOwned] = useState('');
+  const m_etherscan = 'https://etherscan.io/'
+  const g_etherscan = 'https://goerli.etherscan.io/'
 
   async function handleButton () {
     if(button === 'Connect Wallet') {
       await getSigner();
     } else if(button === 'Sign In') {
-      await SignIn();
+      await DeployContract('Howdy', 'HOWDY', '10000000000000000', '0', 10000, 'goerli')//SignIn();
     }
   }
 
@@ -50,12 +52,25 @@ function App() {
     // alert(notice)
   }
 
+  async function DeployContract(name, symbol, price, wlPrice, maxSupply, network) {
+    const message = Date.now().toString();
+    const signature = await signer.signMessage(message)
+
+    const deploy = await axios.get(`${URL}deploy_nft?name=${name}&symbol=${symbol}&price=${price}&whitelist_price=${wlPrice}&maxSupply=${maxSupply}&wallet=${userAddress}&message=${message}&signature=${signature}&network=${network}`);
+    console.log(deploy.data.output.data);
+
+    const etherscan = network == 'goerli' ? g_etherscan : m_etherscan;
+
+    document.getElementById('link').innerHTML = '<a href=' + etherscan + '/address/' + deploy.data.output.data + ' target="blank">See Contract</a>'
+  }
+
   return (
     <div className="App">
       <div>
       </div>
       <h1>Contract Factory</h1>
       <div className="card">
+        <p id='link'></p>
         <p>{message}</p>
         <button onClick={() => handleButton()}>
           {button}
