@@ -30,7 +30,7 @@ function App() {
         signer = await provider.getSigner();
         userAddress = await signer.getAddress();
         setMessage('Connected: ' + userAddress);
-        setButton('Sign In');  
+        setButton('Deploy Contract');  
       } catch{
         getSigner();
       }
