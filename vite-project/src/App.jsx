@@ -19,7 +19,7 @@ function App() {
     if(button === 'Connect Wallet') {
       await getSigner();
     } else if(button === 'Sign In') {
-      await DeployContract('Howdy', 'HOWDY', '10000000000000000', '0', 10000, 'goerli')//SignIn();
+      await SignIn();
     }
   }
 
@@ -30,7 +30,7 @@ function App() {
         signer = await provider.getSigner();
         userAddress = await signer.getAddress();
         setMessage('Connected: ' + userAddress);
-        setButton('Deploy Contract');  
+        setButton('Sign In');  
       } catch{
         getSigner();
       }
@@ -52,16 +52,44 @@ function App() {
     // alert(notice)
   }
 
-  async function DeployContract(name, symbol, price, wlPrice, maxSupply, network) {
+  async function DeployContract(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value;
+    const symbol = document.getElementById('symbol').value;
+    const price = document.getElementById('price').value;
+    const wlPrice = document.getElementById('wlPrice').value;
+    const maxSupply = document.getElementById('maxSupply').value;
+    const network = document.getElementById('network').value;
+
     const message = Date.now().toString();
     const signature = await signer.signMessage(message)
 
     const deploy = await axios.get(`${URL}deploy_nft?name=${name}&symbol=${symbol}&price=${price}&whitelist_price=${wlPrice}&maxSupply=${maxSupply}&wallet=${userAddress}&message=${message}&signature=${signature}&network=${network}`);
-    console.log(deploy.data.output.data);
+    console.log(deploy);
 
     const etherscan = network == 'goerli' ? g_etherscan : m_etherscan;
 
     document.getElementById('link').innerHTML = '<a href=' + etherscan + '/address/' + deploy.data.output.data + ' target="blank">See Contract</a>'
+  }
+
+  async function SetState(e) {
+    e.preventDefault();
+
+    if(!userAddress){
+      await getSigner();
+    }
+
+    const message = Date.now().toString();
+    const signature = await signer.signMessage(message)
+
+    const contract = document.getElementById('contract_address').value;
+    const state = document.getElementById('states').value;
+
+    const setState = await axios.get(`${URL}set_state?contract=${contract}&state=${state}&signature=${signature}&message=${message}&wallet=${userAddress}&network=${'goerli'}`)
+
+   document.getElementById('link').innerHTML = '<a href=' + g_etherscan + '/tx/' + setState.data.output.tx + ' target="blank">See Transaction</a>'
+
   }
 
   return (
@@ -76,6 +104,28 @@ function App() {
           {button}
         </button>
         <p>{owned}</p>
+
+        <form onSubmit={(e) => DeployContract(e)}>
+          <input type='text' id='name' placeholder='name' defaultValue='Test'></input> <br/>
+          <input type='text' id='symbol' placeholder='symbol' defaultValue='TEST'></input> <br/>
+          <input type='text' id='price' placeholder='price' defaultValue='80000000000000000'></input> <br/>
+          <input type='text' id='wlPrice' placeholder='wlPrice' defaultValue='60000000000000000'></input> <br/>
+          <input type='text' id='maxSupply' placeholder='maxSupply' defaultValue='5000'></input> <br/>
+          <input type='text' id='network' placeholder='network' defaultValue='goerli'></input> <br/>
+
+          <button type='submit'>Deploy</button>
+        </form>
+        <br/>
+        <form onSubmit={(e) => SetState(e)}>
+          <select id='states'>
+            <option value='0'>Closed</option>
+            <option value='1'>Whitelist Only</option>
+            <option value='2'>Public</option>
+          </select> <br/>
+          <input type='text' id='contract_address' placeholder='contract address'></input> <br/>
+
+          <button type='submit'>Set State</button>
+        </form>
       </div>
     </div>
   )
