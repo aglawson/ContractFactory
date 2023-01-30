@@ -103,7 +103,7 @@ function App() {
         <button onClick={() => handleButton()}>
           {button}
         </button>
-        <p>{owned}</p>
+        <p>Owned Contracts: {owned}</p>
 
         <form onSubmit={(e) => DeployContract(e)}>
           <input type='text' id='name' placeholder='name' defaultValue='Test'></input> <br/>
@@ -111,7 +111,10 @@ function App() {
           <input type='text' id='price' placeholder='price' defaultValue='80000000000000000'></input> <br/>
           <input type='text' id='wlPrice' placeholder='wlPrice' defaultValue='60000000000000000'></input> <br/>
           <input type='text' id='maxSupply' placeholder='maxSupply' defaultValue='5000'></input> <br/>
-          <input type='text' id='network' placeholder='network' defaultValue='goerli'></input> <br/>
+          <select type='text' id='network' placeholder='network'>
+            <option value='goerli'>Goerli</option> 
+            <option value='mainnet'>Mainnet</option>
+          </select> <br/>
 
           <button type='submit'>Deploy</button>
         </form>
