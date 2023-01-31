@@ -36,6 +36,19 @@ function App() {
       }
   }
 
+  async function getSignature () {
+    if(!signer) {
+      await getSigner()
+    }
+    const message = Date.now().toString()
+    const signature = await signer.signMessage(message)
+
+    return {
+      message: message,
+      signature: signature
+    }
+  }
+
   async function SignIn() {
     const message = Date.now().toString();
     const signature = await signer.signMessage(message)
@@ -92,6 +105,32 @@ function App() {
 
   }
 
+  async function AppendWhitelist(e) {
+    e.preventDefault()
+    const contract = document.getElementById('contract_address').value
+    const network = document.getElementById('network').value;
+    const whitelist = document.getElementById('whitelist').value.split(',')
+
+    console.log(whitelist);
+
+    if(!userAddress) {
+      await getSigner();
+    }
+
+    if(!contract) {
+      alert('Contract address not specified')
+    }
+
+    const signObj = await getSignature()
+    
+    try{
+      const append = await axios.get(`${URL}append_whitelist?contract=${contract}&wallets=${whitelist}&signature=${signObj.signature}&message=${signObj.message}&wallet=${userAddress}&network=${network}`)
+      console.log(append.data);
+    } catch (error) {
+      alert(error);
+    }
+  }
+
   return (
     <div className="App">
       <div>
@@ -128,6 +167,11 @@ function App() {
           <input type='text' id='contract_address' placeholder='contract address'></input> <br/>
 
           <button type='submit'>Set State</button>
+        </form>
+
+        <form onSubmit={(e) => AppendWhitelist(e)}>
+          <input type='text' id='whitelist' placeholder='addresses to add to allow list'></input>
+          <button type='submit'>Add to Allow List</button>
         </form>
       </div>
     </div>
