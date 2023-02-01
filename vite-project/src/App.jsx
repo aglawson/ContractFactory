@@ -74,11 +74,12 @@ function App() {
     const wlPrice = document.getElementById('wlPrice').value
     const maxSupply = document.getElementById('maxSupply').value;
     const network = document.getElementById('network').value;
+    const uri = document.getElementById('uri').value;
 
     const message = Date.now().toString();
     const signature = await signer.signMessage(message)
 
-    const deploy = await axios.get(`${URL}deploy_nft?name=${name}&symbol=${symbol}&price=${(price * 10**18).toString()}&whitelist_price=${(wlPrice * 10**18).toString()}&maxSupply=${maxSupply}&wallet=${userAddress}&message=${message}&signature=${signature}&network=${network}`);
+    const deploy = await axios.get(`${URL}deploy_nft?name=${name}&symbol=${symbol}&price=${(price * 10**18).toString()}&whitelist_price=${(wlPrice * 10**18).toString()}&maxSupply=${maxSupply}&wallet=${userAddress}&message=${message}&signature=${signature}&network=${network}&uri=${uri}`);
     console.log(deploy);
 
     const etherscan = network == 'goerli' ? g_etherscan : m_etherscan;
@@ -150,9 +151,11 @@ function App() {
           <input type='text' id='price' placeholder='price' defaultValue='0.08'></input> <br/>
           <input type='text' id='wlPrice' placeholder='wlPrice' defaultValue='0.06'></input> <br/>
           <input type='text' id='maxSupply' placeholder='maxSupply' defaultValue='5000'></input> <br/>
+          <input type='text' id='uri' placeholder='base uri' defaultValue='https://ipfs.io/ipfs/hash'></input> <br/>
           <select type='text' id='network' placeholder='network'>
             <option value='goerli'>Goerli</option> 
             <option value='mainnet'>Mainnet</option>
+            <option value='polygon'>Polygon</option>
           </select> <br/>
 
           <button type='submit'>Deploy</button>
