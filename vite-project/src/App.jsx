@@ -14,12 +14,33 @@ function App() {
   const [owned, setOwned] = useState('');
   const m_etherscan = 'https://etherscan.io/'
   const g_etherscan = 'https://goerli.etherscan.io/'
+  const avax_scan = 'https://snowtrace.io/'
+  const polygonscan = 'https://polygonscan.com/'
+  const arbiscan = 'https://arbiscan.io/'
+  const optimism = 'https://optimistic.etherscan.io/'
 
   async function handleButton () {
     if(button === 'Connect Wallet') {
       await getSigner();
     } else if(button === 'Sign In') {
       await SignIn();
+    }
+  }
+
+  function getBlockExplorer(network) {
+    switch (network) {
+      case 'goerli':
+        return g_etherscan
+      case 'mainnet':
+        return m_etherscan
+      case 'avax':
+        return avax_scan
+      case 'polygon':
+        return polygonscan
+      case 'arbitrum':
+        return arbiscan
+      case 'optimism':
+        return optimism
     }
   }
 
@@ -82,9 +103,13 @@ function App() {
     const deploy = await axios.get(`${URL}deploy_nft?name=${name}&symbol=${symbol}&price=${(price * 10**18).toString()}&whitelist_price=${(wlPrice * 10**18).toString()}&maxSupply=${maxSupply}&wallet=${userAddress}&message=${message}&signature=${signature}&network=${network}&uri=${uri}`);
     console.log(deploy);
 
-    const etherscan = network == 'goerli' ? g_etherscan : m_etherscan;
+    const etherscan = getBlockExplorer(network)
 
-    document.getElementById('link').innerHTML = '<a href=' + etherscan + '/address/' + deploy.data.output.data + ' target="blank">See Contract</a>'
+    try{
+      document.getElementById('link').innerHTML = '<a href=' + etherscan + '/address/' + deploy.data.output.data + ' target="blank">See Contract</a>'
+    } catch (err) {
+      alert(deploy.data.error.reason)
+    }
   }
 
   async function SetState(e) {
@@ -103,8 +128,14 @@ function App() {
 
     const setState = await axios.get(`${URL}set_state?contract=${contract}&state=${state}&signature=${signature}&message=${message}&wallet=${userAddress}&network=${network}`)
     console.log(setState);
-    document.getElementById('link').innerHTML = '<a href=' + g_etherscan + '/tx/' + setState.data.output.tx + ' target="blank">See Transaction</a>'
+    
+    const etherscan = getBlockExplorer(network)
 
+    try {
+      document.getElementById('link').innerHTML = '<a href=' + etherscan + '/tx/' + setState.data.output.tx + ' target="blank">See Transaction</a>'
+    } catch (err) {
+      alert(setState.data.error.reason)
+    }
   }
 
   async function AppendWhitelist(e) {
@@ -128,6 +159,11 @@ function App() {
     try{
       const append = await axios.get(`${URL}append_whitelist?contract=${contract}&wallets=${whitelist}&signature=${signObj.signature}&message=${signObj.message}&wallet=${userAddress}&network=${network}`)
       console.log(append.data);
+
+      const etherscan = getBlockExplorer(network)
+
+      document.getElementById('link').innerHTML = '<a href=' + etherscan + '/tx/' + append.data.output.tx + ' target="blank">See Transaction</a>'
+  
     } catch (error) {
       alert(error);
     }
@@ -157,6 +193,9 @@ function App() {
             <option value='goerli'>Goerli</option> 
             <option value='mainnet'>Mainnet</option>
             <option value='polygon'>Polygon</option>
+            <option value='arbitrum'>Arbitrum</option>
+            <option value='avax'>Avalanche</option>
+            <option value='optimism'>Optimism</option>
           </select> <br/>
 
           <button type='submit'>Deploy</button>
