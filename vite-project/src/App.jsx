@@ -99,10 +99,11 @@ function App() {
 
     const contract = document.getElementById('contract_address').value;
     const state = document.getElementById('states').value;
+    const network = document.getElementById('network').value
 
-    const setState = await axios.get(`${URL}set_state?contract=${contract}&state=${state}&signature=${signature}&message=${message}&wallet=${userAddress}&network=${'goerli'}`)
-
-   document.getElementById('link').innerHTML = '<a href=' + g_etherscan + '/tx/' + setState.data.output.tx + ' target="blank">See Transaction</a>'
+    const setState = await axios.get(`${URL}set_state?contract=${contract}&state=${state}&signature=${signature}&message=${message}&wallet=${userAddress}&network=${network}`)
+    console.log(setState);
+    document.getElementById('link').innerHTML = '<a href=' + g_etherscan + '/tx/' + setState.data.output.tx + ' target="blank">See Transaction</a>'
 
   }
 
