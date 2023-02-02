@@ -79,11 +79,9 @@ function App() {
     console.log(owned_contracts)
     let oc = '';
     for(let i = 0; i < owned_contracts.data.output.data.length; i++) {
-      oc += `${owned_contracts.data.output.data[i]}, `
+      oc += ` - ${owned_contracts.data.output.data[i]} - `
     }
     setOwned(oc);
-    // const notice = auth.data === true ? 'Login Successful' : 'Login Failed';
-    // alert(notice)
   }
 
   async function DeployContract(e) {
@@ -128,7 +126,7 @@ function App() {
 
     const setState = await axios.get(`${URL}set_state?contract=${contract}&state=${state}&signature=${signature}&message=${message}&wallet=${userAddress}&network=${network}`)
     console.log(setState);
-    
+
     const etherscan = getBlockExplorer(network)
 
     try {
@@ -155,7 +153,7 @@ function App() {
     }
 
     const signObj = await getSignature()
-    
+
     try{
       const append = await axios.get(`${URL}append_whitelist?contract=${contract}&wallets=${whitelist}&signature=${signObj.signature}&message=${signObj.message}&wallet=${userAddress}&network=${network}`)
       console.log(append.data);
@@ -163,7 +161,7 @@ function App() {
       const etherscan = getBlockExplorer(network)
 
       document.getElementById('link').innerHTML = '<a href=' + etherscan + '/tx/' + append.data.output.tx + ' target="blank">See Transaction</a>'
-  
+
     } catch (error) {
       alert(error);
     }
