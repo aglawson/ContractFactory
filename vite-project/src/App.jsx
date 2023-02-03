@@ -11,7 +11,8 @@ let userAddress;
 function App() {
   const [button, setButton] = useState('Connect Wallet')
   const [message, setMessage] = useState('Connect Wallet');
-  const [owned, setOwned] = useState('');
+  const [owned, setOwned] = useState([]);
+
   const m_etherscan = 'https://etherscan.io/'
   const g_etherscan = 'https://goerli.etherscan.io/'
   const avax_scan = 'https://snowtrace.io/'
@@ -77,11 +78,17 @@ function App() {
     //const auth = await axios.get(`${URL}signature_auth?wallet=${userAddress}&message=${message}&signature=${signature}`);
     const owned_contracts = await axios.get(`${URL}get_owned_contracts?wallet=${userAddress}&message=${message}&signature=${signature}`);
     console.log(owned_contracts)
-    let oc = '';
+    let ow = []
     for(let i = 0; i < owned_contracts.data.output.data.length; i++) {
-      oc += ` - ${owned_contracts.data.output.data[i]} - `
+      owned.push(owned_contracts.data.output.data[i]);
     }
-    setOwned(oc);
+    console.log(owned);
+
+    let html = `<select type='text' id='contract_address'>`
+    for(let i = 0; i < owned.length; i++) {
+      html += `<option value=${owned[i]}>${owned[i]}</option>`
+    }
+    document.getElementById('owned_contracts').innerHTML = `${html}</select> <br/>`
   }
 
   async function DeployContract(e) {
@@ -121,6 +128,7 @@ function App() {
     const signature = await signer.signMessage(message)
 
     const contract = document.getElementById('contract_address').value;
+    
     const state = document.getElementById('states').value;
     const network = document.getElementById('network').value
 
@@ -178,7 +186,9 @@ function App() {
         <button onClick={() => handleButton()}>
           {button}
         </button>
-        <p>Owned Contracts: {owned}</p>
+        <br/>
+        <div id='owned_contracts'></div>
+        <br/>
 
         <form onSubmit={(e) => DeployContract(e)}>
           <input type='text' id='name' placeholder='name' defaultValue='Test'></input> <br/>
@@ -187,6 +197,7 @@ function App() {
           <input type='text' id='wlPrice' placeholder='wlPrice' defaultValue='0.06'></input> <br/>
           <input type='text' id='maxSupply' placeholder='maxSupply' defaultValue='5000'></input> <br/>
           <input type='text' id='uri' placeholder='base uri' defaultValue='https://ipfs.io/ipfs/hash'></input> <br/>
+
           <select type='text' id='network' placeholder='network'>
             <option value='goerli'>Goerli</option> 
             <option value='mainnet'>Mainnet</option>
@@ -200,11 +211,13 @@ function App() {
         </form>
         <br/>
         <form onSubmit={(e) => SetState(e)}>
+
           <select id='states'>
             <option value='0'>Closed</option>
             <option value='1'>Whitelist Only</option>
             <option value='2'>Public</option>
           </select> <br/>
+          
           <input type='text' id='contract_address' placeholder='contract address'></input> <br/>
 
           <button type='submit'>Set State</button>
