@@ -180,6 +180,7 @@ function App() {
       <div>
       </div>
       <h1>Contract Factory</h1>
+      <p>Must own an access NFT. Mint one here: </p><a href='https://accessnft.netlify.app/' target='blank'>Access NFT</a>
       <div className="card">
         <p id='link'></p>
         <p>{message}</p>
@@ -217,7 +218,7 @@ function App() {
             <option value='1'>Whitelist Only</option>
             <option value='2'>Public</option>
           </select> <br/>
-          
+
           <input type='text' id='contract_address' placeholder='contract address'></input> <br/>
 
           <button type='submit'>Set State</button>
